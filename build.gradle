@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.example'
-version '1.0.1-SNAPSHOT'
+version '1.0.1'
 
 repositories {
     mavenCentral()
@@ -19,8 +19,8 @@ intellij {
     version '2020.1'
     plugins = ['maven','java']
 }
+
 patchPluginXml {
-    changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+    pluginDescription(file(descriptionFile).text)
+    changeNotes(file(changesFile).text)
 }

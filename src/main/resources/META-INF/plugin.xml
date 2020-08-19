@@ -3,9 +3,7 @@
     <name>Maven Project Version</name>
     <vendor email="felix.sunjian@gmail.com" url="https://github.com/Felixzz/maven-project-version-plugin">felixsun</vendor>
 
-    <description><![CDATA[
-    batch set maven version for each modules <br>
-    ]]></description>
+    <description><![CDATA[ Description will be added by gradle build]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -26,4 +24,6 @@
                           relative-to-action="Maven.AddManagedFiles"/>
         </action>
     </actions>
+
+    <change-notes><![CDATA[	Change notes will be filled by gradle build ]]></change-notes>
 </idea-plugin>
