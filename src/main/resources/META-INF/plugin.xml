@@ -2,7 +2,7 @@
     <id>com.felixzz.maven-project-version-plugin</id>
     <name>Maven Project Version</name>
     <vendor email="felix.sunjian@gmail.com" url="https://github.com/Felixzz/maven-project-version-plugin">felixsun</vendor>
-
+    <idea-version since-build="181"/>
     <description><![CDATA[ Description will be added by gradle build]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -13,15 +13,16 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <fileIconProvider implementation="org.jetbrains.idea.maven.utils.MavenIconProvider"/>
     </extensions>
 
     <actions>
         <!-- Add your actions here -->
         <action id="com.felixzz.action.MvnProjectVersionAction"
                 class="com.felixzz.action.MvnProjectVersionAction" text="Set the Project Version"
-                description="Set the project version">
+                description="Set the project version" icon="AllIcons.Actions.PreviousOccurence">
             <add-to-group group-id="Maven.NavigatorActionsToolbar" anchor="after"
-                          relative-to-action="Maven.AddManagedFiles"/>
+                          relative-to-action="Maven.AddManagedFiles" />
         </action>
     </actions>
 
