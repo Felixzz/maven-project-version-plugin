@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.felixzz.maven-project-version-plugin</id>
-    <name>maven project version</name>
-    <vendor email="felix.sunjian@gmail.com" url="https://github.com/Felixzz/maven-project-version-plugin">iqiyi</vendor>
+    <name>Maven Project Version</name>
+    <vendor email="felix.sunjian@gmail.com" url="https://github.com/Felixzz/maven-project-version-plugin">felixsun</vendor>
 
     <description><![CDATA[
     batch set maven version for each modules <br>
