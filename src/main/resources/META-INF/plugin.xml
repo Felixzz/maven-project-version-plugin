@@ -1,0 +1,29 @@
+<idea-plugin>
+    <id>com.felixzz.maven-project-version-plugin</id>
+    <name>maven project version</name>
+    <vendor email="felix.sunjian@gmail.com" url="https://github.com/Felixzz/maven-project-version-plugin">iqiyi</vendor>
+
+    <description><![CDATA[
+    batch set maven version for each modules <br>
+    ]]></description>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.idea.maven</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="com.felixzz.action.MvnProjectVersionAction"
+                class="com.felixzz.action.MvnProjectVersionAction" text="Set the Project Version"
+                description="Set the project version">
+            <add-to-group group-id="Maven.NavigatorActionsToolbar" anchor="after"
+                          relative-to-action="Maven.AddManagedFiles"/>
+        </action>
+    </actions>
+</idea-plugin>
