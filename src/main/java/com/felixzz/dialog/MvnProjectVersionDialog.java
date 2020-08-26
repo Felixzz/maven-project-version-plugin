@@ -10,6 +10,9 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.util.ui.JBUI;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
 import com.intellij.util.xml.GenericDomValue;
@@ -52,17 +55,33 @@ public class MvnProjectVersionDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         JPanel dialogPanel = new JPanel();
-        dialogPanel.setLayout(new GridLayout(2, 2));
+        dialogPanel.setLayout(new GridLayoutManager(2, 2, JBUI.emptyInsets(), -1, -1));
         JLabel label = new JLabel("Root Project:");
-        dialogPanel.add(label);
+        dialogPanel.add(label, new GridConstraints(0, 0, 1, 1,
+                GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                null, null, null));
         ComboBox<MavenProject> comboBox = new ComboBox<>();
         comboBox.setRenderer(new CustomRenderer());
         flushComboBox(comboBox);
-        dialogPanel.add(comboBox);
+        dialogPanel.add(comboBox, new GridConstraints(0, 1, 1, 1,
+                GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                null, null, null));
         JLabel newVersion = new JLabel("New Version:");
         newVersionContent = new JTextField();
-        dialogPanel.add(newVersion);
-        dialogPanel.add(newVersionContent);
+        dialogPanel.add(newVersion, new GridConstraints(1, 0, 1, 1,
+                GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                null, null, null));
+        dialogPanel.add(newVersionContent, new GridConstraints(1, 1, 1, 1,
+                GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                null, null, null));
         comboBox.addActionListener(e -> {
             Object o = comboBox.getSelectedItem();
             if (o != null) {
