@@ -22,9 +22,11 @@ public class MvnProjectVersionAction extends MavenAction {
 
     @Override
     protected boolean isAvailable(@NotNull AnActionEvent e) {
-        if (!super.isAvailable(e)) return false;
+        if (!super.isAvailable(e)) {
+            return false;
+        }
         final MavenProjectsManager projectsManager = MavenActionUtil.getProjectsManager(e.getDataContext());
         return projectsManager != null && projectsManager.isMavenizedProject();
     }
-    
+
 }

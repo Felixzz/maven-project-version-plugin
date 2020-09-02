@@ -33,11 +33,12 @@ import java.util.Objects;
  * @date 2020/8/18 15:53
  */
 public class MvnProjectVersionDialog extends DialogWrapper {
+
     private final Project project;
 
-    private final MavenProjectsManager projectsManager;
-
     private final List<MavenProject> allProjects;
+
+    private final List<MavenProject> rootProjects;
 
     private MavenProject rootProject;
 
@@ -47,8 +48,9 @@ public class MvnProjectVersionDialog extends DialogWrapper {
         super(e.getProject());
         setTitle("Set the Project Version");
         this.project = e.getProject();
-        projectsManager = MavenActionUtil.getProjectsManager(e.getDataContext());
+        MavenProjectsManager projectsManager = MavenActionUtil.getProjectsManager(e.getDataContext());
         allProjects = projectsManager == null ? new ArrayList<>() : projectsManager.getProjects();
+        rootProjects = projectsManager == null ? new ArrayList<>() : projectsManager.getRootProjects();
         init();
     }
 
@@ -92,7 +94,6 @@ public class MvnProjectVersionDialog extends DialogWrapper {
     }
 
     private void flushComboBox(ComboBox<MavenProject> comboBox) {
-        List<MavenProject> rootProjects = projectsManager == null ? new ArrayList<>() : projectsManager.getRootProjects();
         for (MavenProject mavenProject : rootProjects) {
             comboBox.addItem(mavenProject);
         }
