@@ -13,10 +13,6 @@ Location
 -------
 ![location.png](https://ftp.bmp.ovh/imgs/2020/08/8929ad13823b25ed.png)
 
-Release History
--------
-[Release History](docs/history.html)
-
 How to Use
 -------
 1. Locate to maven NavigatorActionsToolbar 
@@ -24,6 +20,10 @@ How to Use
 3. Select your root project
 4. Input the version number you expect
 5. Submit
+
+Release History
+-------
+[Release History](docs/history.html)
 
 License
 -------
