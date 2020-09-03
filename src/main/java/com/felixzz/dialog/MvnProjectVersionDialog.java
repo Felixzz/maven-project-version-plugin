@@ -66,7 +66,6 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                 null, null, null));
         ComboBox<MavenProject> comboBox = new ComboBox<>();
         comboBox.setRenderer(new CustomRenderer());
-        flushComboBox(comboBox);
         dialogPanel.add(comboBox, new GridConstraints(0, 1, 1, 1,
                 GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
@@ -84,22 +83,15 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
                 null, null, null));
+        flushComboBox(comboBox);
         comboBox.addActionListener(e -> {
             Object o = comboBox.getSelectedItem();
             if (o != null) {
                 rootProject = (MavenProject) o;
+                initVersionField();
             }
         });
         return dialogPanel;
-    }
-
-    private void flushComboBox(ComboBox<MavenProject> comboBox) {
-        for (MavenProject mavenProject : rootProjects) {
-            comboBox.addItem(mavenProject);
-        }
-        if (!rootProjects.isEmpty()) {
-            rootProject = rootProjects.get(0);
-        }
     }
 
     @Override
@@ -113,9 +105,31 @@ public class MvnProjectVersionDialog extends DialogWrapper {
         return south;
     }
 
+    private void initVersionField() {
+        VirtualFile file = rootProject.getFile();
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+        DomManager domManager = DomManager.getDomManager(project);
+        DomFileElement<MavenDomProjectModel> fileElement = domManager.getFileElement((XmlFile) psiFile, MavenDomProjectModel.class);
+        if (fileElement != null) {
+            MavenDomProjectModel rootElement = fileElement.getRootElement();
+            GenericDomValue<String> version = rootElement.getVersion();
+            newVersionContent.setText(version.getValue());
+        }
+    }
+
+    private void flushComboBox(ComboBox<MavenProject> comboBox) {
+        for (MavenProject mavenProject : rootProjects) {
+            comboBox.addItem(mavenProject);
+        }
+        if (!rootProjects.isEmpty()) {
+            rootProject = rootProjects.get(0);
+            initVersionField();
+        }
+    }
+
     private void updateVersion() {
         final String newVersion = newVersionContent.getText();
-        if(!newVersion.isEmpty()) {
+        if (!newVersion.isEmpty()) {
             for (MavenProject mavenProject : allProjects) {
                 VirtualFile file = mavenProject.getFile();
                 PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
@@ -147,7 +161,6 @@ public class MvnProjectVersionDialog extends DialogWrapper {
             }
         }
         this.close(DialogWrapper.OK_EXIT_CODE);
-
     }
 }
 
