@@ -114,29 +114,32 @@ public class MvnProjectVersionDialog extends DialogWrapper {
     }
 
     private void updateVersion() {
-        for (MavenProject mavenProject : allProjects) {
-            VirtualFile file = mavenProject.getFile();
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-            if (mavenProject.equals(rootProject)) {
-                DomManager domManager = DomManager.getDomManager(project);
-                DomFileElement<MavenDomProjectModel> fileElement = domManager.getFileElement((XmlFile) psiFile, MavenDomProjectModel.class);
-                if (fileElement != null) {
-                    MavenDomProjectModel rootElement = fileElement.getRootElement();
-                    GenericDomValue<String> version = rootElement.getVersion();
-                    version.setValue(newVersionContent.getText());
-                }
-            } else if (mavenProject.getParentId() != null &&
-                    Objects.equals(mavenProject.getParentId().getGroupId(), rootProject.getMavenId().getGroupId()) &&
-                    Objects.equals(mavenProject.getParentId().getArtifactId(), rootProject.getMavenId().getArtifactId())) {
-                XmlFile xmlFile = (XmlFile) psiFile;
-                if (xmlFile != null) {
-                    final XmlTag rootTag = xmlFile.getRootTag();
-                    if (rootTag != null) {
-                        XmlTag parentTag = rootTag.findFirstSubTag("parent");
-                        if (parentTag != null) {
-                            XmlTag versionTag = parentTag.findFirstSubTag("version");
-                            if (versionTag != null) {
-                                versionTag.getValue().setText(newVersionContent.getText());
+        final String newVersion = newVersionContent.getText();
+        if(!newVersion.isEmpty()) {
+            for (MavenProject mavenProject : allProjects) {
+                VirtualFile file = mavenProject.getFile();
+                PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+                if (mavenProject.equals(rootProject)) {
+                    DomManager domManager = DomManager.getDomManager(project);
+                    DomFileElement<MavenDomProjectModel> fileElement = domManager.getFileElement((XmlFile) psiFile, MavenDomProjectModel.class);
+                    if (fileElement != null) {
+                        MavenDomProjectModel rootElement = fileElement.getRootElement();
+                        GenericDomValue<String> version = rootElement.getVersion();
+                        version.setValue(newVersion);
+                    }
+                } else if (mavenProject.getParentId() != null &&
+                        Objects.equals(mavenProject.getParentId().getGroupId(), rootProject.getMavenId().getGroupId()) &&
+                        Objects.equals(mavenProject.getParentId().getArtifactId(), rootProject.getMavenId().getArtifactId())) {
+                    XmlFile xmlFile = (XmlFile) psiFile;
+                    if (xmlFile != null) {
+                        final XmlTag rootTag = xmlFile.getRootTag();
+                        if (rootTag != null) {
+                            XmlTag parentTag = rootTag.findFirstSubTag("parent");
+                            if (parentTag != null) {
+                                XmlTag versionTag = parentTag.findFirstSubTag("version");
+                                if (versionTag != null) {
+                                    versionTag.getValue().setText(newVersion);
+                                }
                             }
                         }
                     }
