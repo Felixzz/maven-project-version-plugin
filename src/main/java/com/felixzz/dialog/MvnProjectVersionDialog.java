@@ -146,21 +146,29 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                         Objects.equals(mavenProject.getParentId().getArtifactId(), rootProject.getMavenId().getArtifactId())) {
                     XmlFile xmlFile = (XmlFile) psiFile;
                     if (xmlFile != null) {
-                        final XmlTag rootTag = xmlFile.getRootTag();
-                        if (rootTag != null) {
-                            XmlTag parentTag = rootTag.findFirstSubTag("parent");
-                            if (parentTag != null) {
-                                XmlTag versionTag = parentTag.findFirstSubTag("version");
-                                if (versionTag != null) {
-                                    versionTag.getValue().setText(newVersion);
-                                }
-                            }
-                        }
+                        updateModuleVersion(newVersion, xmlFile);
                     }
                 }
             }
         }
         this.close(DialogWrapper.OK_EXIT_CODE);
+    }
+
+    private void updateModuleVersion(String newVersion, XmlFile xmlFile) {
+        final XmlTag rootTag = xmlFile.getRootTag();
+        if (rootTag != null) {
+            XmlTag parentTag = rootTag.findFirstSubTag("parent");
+            if (parentTag != null) {
+                XmlTag versionTagFromParent = parentTag.findFirstSubTag("version");
+                if (versionTagFromParent != null) {
+                    versionTagFromParent.getValue().setText(newVersion);
+                }
+            }
+            XmlTag versionTag = rootTag.findFirstSubTag("version");
+            if (versionTag != null) {
+                versionTag.getValue().setText(newVersion);
+            }
+        }
     }
 }
 
