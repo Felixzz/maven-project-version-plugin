@@ -2,6 +2,7 @@ package com.felixzz.dialog;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -36,6 +37,8 @@ public class MvnProjectVersionDialog extends DialogWrapper {
 
     private final Project project;
 
+    private final MavenProjectsManager projectsManager;
+
     private final List<MavenProject> allProjects;
 
     private final List<MavenProject> rootProjects;
@@ -48,7 +51,7 @@ public class MvnProjectVersionDialog extends DialogWrapper {
         super(e.getProject());
         setTitle("Set the Project Version");
         this.project = e.getProject();
-        MavenProjectsManager projectsManager = MavenActionUtil.getProjectsManager(e.getDataContext());
+        projectsManager = MavenActionUtil.getProjectsManager(e.getDataContext());
         allProjects = projectsManager == null ? new ArrayList<>() : projectsManager.getProjects();
         rootProjects = projectsManager == null ? new ArrayList<>() : projectsManager.getRootProjects();
         init();
@@ -150,6 +153,8 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                     }
                 }
             }
+            FileDocumentManager.getInstance().saveAllDocuments();
+            projectsManager.forceUpdateProjects(allProjects);
         }
         this.close(DialogWrapper.OK_EXIT_CODE);
     }
