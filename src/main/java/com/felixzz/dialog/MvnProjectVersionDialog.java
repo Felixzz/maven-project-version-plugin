@@ -18,6 +18,8 @@ import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
 import com.intellij.util.xml.GenericDomValue;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.idea.maven.dom.model.MavenDomDependencies;
+import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
@@ -26,6 +28,7 @@ import org.jetbrains.idea.maven.utils.actions.MavenActionUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -144,6 +147,15 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                             MavenDomProjectModel rootElement = fileElement.getRootElement();
                             GenericDomValue<String> version = rootElement.getVersion();
                             version.setValue(newVersion);
+                            MavenDomDependencies mavenDomDependencies = rootElement.getDependencyManagement().getDependencies();
+                            List<MavenDomDependency> dependencies = mavenDomDependencies.getDependencies();
+                            Collection<String> moduleNames = rootProject.getModulesPathsAndNames().values();
+                            for (MavenDomDependency dependency : dependencies) {
+                                if(Objects.equals(dependency.getGroupId().getRawText(), rootProject.getMavenId().getGroupId()) &&
+                                        moduleNames.contains(dependency.getArtifactId().getRawText())){
+                                    dependency.getVersion().setValue(newVersion);
+                                }
+                            }
                         }
                     } else if (mavenProject.getParentId() != null &&
                             Objects.equals(mavenProject.getParentId().getGroupId(), rootProject.getMavenId().getGroupId()) &&
