@@ -132,29 +132,38 @@ public class MvnProjectVersionDialog extends DialogWrapper {
 
     private void updateVersion() {
         final String newVersion = newVersionContent.getText();
-        if (!newVersion.isEmpty()) {
-            for (MavenProject mavenProject : allProjects) {
-                VirtualFile file = mavenProject.getFile();
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-                if (mavenProject.equals(rootProject)) {
-                    DomManager domManager = DomManager.getDomManager(project);
-                    DomFileElement<MavenDomProjectModel> fileElement = domManager.getFileElement((XmlFile) psiFile, MavenDomProjectModel.class);
-                    if (fileElement != null) {
-                        MavenDomProjectModel rootElement = fileElement.getRootElement();
-                        GenericDomValue<String> version = rootElement.getVersion();
-                        version.setValue(newVersion);
-                    }
-                } else if (mavenProject.getParentId() != null &&
-                        Objects.equals(mavenProject.getParentId().getGroupId(), rootProject.getMavenId().getGroupId()) &&
-                        Objects.equals(mavenProject.getParentId().getArtifactId(), rootProject.getMavenId().getArtifactId())) {
-                    XmlFile xmlFile = (XmlFile) psiFile;
-                    if (xmlFile != null) {
-                        updateModuleVersion(newVersion, xmlFile);
+        try {
+            if (!newVersion.isEmpty()) {
+                for (MavenProject mavenProject : allProjects) {
+                    VirtualFile file = mavenProject.getFile();
+                    PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+                    if (mavenProject.equals(rootProject)) {
+                        DomManager domManager = DomManager.getDomManager(project);
+                        DomFileElement<MavenDomProjectModel> fileElement = domManager.getFileElement((XmlFile) psiFile, MavenDomProjectModel.class);
+                        if (fileElement != null) {
+                            MavenDomProjectModel rootElement = fileElement.getRootElement();
+                            GenericDomValue<String> version = rootElement.getVersion();
+                            version.setValue(newVersion);
+                        }
+                    } else if (mavenProject.getParentId() != null &&
+                            Objects.equals(mavenProject.getParentId().getGroupId(), rootProject.getMavenId().getGroupId()) &&
+                            Objects.equals(mavenProject.getParentId().getArtifactId(), rootProject.getMavenId().getArtifactId())) {
+                        XmlFile xmlFile = (XmlFile) psiFile;
+                        if (xmlFile != null) {
+                            updateModuleVersion(newVersion, xmlFile);
+                        }
                     }
                 }
+                try {
+                    FileDocumentManager.getInstance().saveAllDocuments();
+                    projectsManager.forceUpdateProjects(allProjects);
+                } catch (Exception e) {
+                    FileDocumentManager.getInstance().saveAllDocuments();
+                    projectsManager.forceUpdateProjects(allProjects);
+                }
             }
-            FileDocumentManager.getInstance().saveAllDocuments();
-            projectsManager.forceUpdateProjects(allProjects);
+        } catch (Exception ignored) {
+
         }
         this.close(DialogWrapper.OK_EXIT_CODE);
     }
