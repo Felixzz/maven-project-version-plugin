@@ -26,7 +26,6 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.idea.maven.utils.actions.MavenActionUtil;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -135,27 +134,21 @@ public class MvnProjectVersionDialog extends DialogWrapper {
 
     private void updateVersion() {
         final String newVersion = newVersionContent.getText();
+        Collection<String> moduleNames = rootProject.getModulesPathsAndNames().values();
+        DomManager domManager = DomManager.getDomManager(project);
         try {
             if (!newVersion.isEmpty()) {
                 for (MavenProject mavenProject : allProjects) {
                     VirtualFile file = mavenProject.getFile();
                     PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
                     if (mavenProject.equals(rootProject)) {
-                        DomManager domManager = DomManager.getDomManager(project);
                         DomFileElement<MavenDomProjectModel> fileElement = domManager.getFileElement((XmlFile) psiFile, MavenDomProjectModel.class);
                         if (fileElement != null) {
                             MavenDomProjectModel rootElement = fileElement.getRootElement();
                             GenericDomValue<String> version = rootElement.getVersion();
                             version.setValue(newVersion);
-                            MavenDomDependencies mavenDomDependencies = rootElement.getDependencyManagement().getDependencies();
-                            List<MavenDomDependency> dependencies = mavenDomDependencies.getDependencies();
-                            Collection<String> moduleNames = rootProject.getModulesPathsAndNames().values();
-                            for (MavenDomDependency dependency : dependencies) {
-                                if(Objects.equals(dependency.getGroupId().getRawText(), rootProject.getMavenId().getGroupId()) &&
-                                        moduleNames.contains(dependency.getArtifactId().getRawText())){
-                                    dependency.getVersion().setValue(newVersion);
-                                }
-                            }
+                            updateDependencyVersion(rootElement.getDependencyManagement().getDependencies(), newVersion, moduleNames);
+                            updateDependencyVersion(rootElement.getDependencies(), newVersion, moduleNames);
                         }
                     } else if (mavenProject.getParentId() != null &&
                             Objects.equals(mavenProject.getParentId().getGroupId(), rootProject.getMavenId().getGroupId()) &&
@@ -163,6 +156,11 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                         XmlFile xmlFile = (XmlFile) psiFile;
                         if (xmlFile != null) {
                             updateModuleVersion(newVersion, xmlFile);
+                        }
+                        DomFileElement<MavenDomProjectModel> fileElement = domManager.getFileElement(xmlFile, MavenDomProjectModel.class);
+                        if (fileElement != null) {
+                            MavenDomProjectModel rootElement = fileElement.getRootElement();
+                            updateDependencyVersion(rootElement.getDependencies(), newVersion, moduleNames);
                         }
                     }
                 }
@@ -180,6 +178,17 @@ public class MvnProjectVersionDialog extends DialogWrapper {
         this.close(DialogWrapper.OK_EXIT_CODE);
     }
 
+    private void updateDependencyVersion(MavenDomDependencies mavenDomDependencies, String newVersion, Collection<String> moduleNames) {
+        List<MavenDomDependency> dependencies = mavenDomDependencies.getDependencies();
+        for (MavenDomDependency dependency : dependencies) {
+            if (Objects.equals(dependency.getGroupId().getRawText(), rootProject.getMavenId().getGroupId()) &&
+                    moduleNames.contains(dependency.getArtifactId().getRawText())
+                    && dependency.getVersion().getValue() != null) {
+                dependency.getVersion().setValue(newVersion);
+            }
+        }
+    }
+
     private void updateModuleVersion(String newVersion, XmlFile xmlFile) {
         final XmlTag rootTag = xmlFile.getRootTag();
         if (rootTag != null) {
@@ -195,15 +204,5 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                 versionTag.getValue().setText(newVersion);
             }
         }
-    }
-}
-
-
-class CustomRenderer extends DefaultListCellRenderer {
-    @Override
-    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        MavenProject item = (MavenProject) value;
-        String str = item.getMavenId().getGroupId() + ":" + item.getMavenId().getArtifactId();
-        return super.getListCellRendererComponent(list, str, index, isSelected, cellHasFocus);
     }
 }
