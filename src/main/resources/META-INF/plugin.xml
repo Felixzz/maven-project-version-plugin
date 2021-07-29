@@ -13,7 +13,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <fileIconProvider implementation="org.jetbrains.idea.maven.utils.MavenIconProvider"/>
+<!--        Created extension classloader is not equal to plugin's one  issue#8 -->
+<!--        <fileIconProvider implementation="org.jetbrains.idea.maven.utils.MavenIconProvider"/>-->
     </extensions>
 
     <actions>
