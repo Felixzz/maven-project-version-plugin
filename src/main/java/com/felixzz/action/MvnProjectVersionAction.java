@@ -15,9 +15,9 @@ public class MvnProjectVersionAction extends MavenAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        MvnProjectVersionDialog formTestDialog = new MvnProjectVersionDialog(e);
-        formTestDialog.setResizable(false);
-        formTestDialog.show();
+        MvnProjectVersionDialog formDialog = new MvnProjectVersionDialog(e);
+        formDialog.setResizable(false);
+        formDialog.show();
     }
 
     @Override

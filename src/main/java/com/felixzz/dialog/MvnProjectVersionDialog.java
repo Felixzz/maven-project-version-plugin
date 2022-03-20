@@ -26,10 +26,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 import org.jetbrains.idea.maven.utils.actions.MavenActionUtil;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Felix
@@ -134,8 +131,8 @@ public class MvnProjectVersionDialog extends DialogWrapper {
 
     private void updateVersion() {
         final String newVersion = newVersionContent.getText();
-        Collection<String> moduleNames = rootProject.getModulesPathsAndNames().values();
         DomManager domManager = DomManager.getDomManager(project);
+        Collection<String> allModuleNames = getAllModuleNames();
         try {
             if (!newVersion.isEmpty()) {
                 for (MavenProject mavenProject : allProjects) {
@@ -147,12 +144,9 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                             MavenDomProjectModel rootElement = fileElement.getRootElement();
                             GenericDomValue<String> version = rootElement.getVersion();
                             version.setValue(newVersion);
-                            updateDependencyVersion(rootElement.getDependencyManagement().getDependencies(), newVersion, moduleNames);
-                            updateDependencyVersion(rootElement.getDependencies(), newVersion, moduleNames);
+                            updateDependencyVersion(rootElement, newVersion, allModuleNames);
                         }
-                    } else if (mavenProject.getParentId() != null &&
-                            Objects.equals(mavenProject.getParentId().getGroupId(), rootProject.getMavenId().getGroupId()) &&
-                            Objects.equals(mavenProject.getParentId().getArtifactId(), rootProject.getMavenId().getArtifactId())) {
+                    } else {
                         XmlFile xmlFile = (XmlFile) psiFile;
                         if (xmlFile != null) {
                             updateModuleVersion(newVersion, xmlFile);
@@ -160,7 +154,7 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                         DomFileElement<MavenDomProjectModel> fileElement = domManager.getFileElement(xmlFile, MavenDomProjectModel.class);
                         if (fileElement != null) {
                             MavenDomProjectModel rootElement = fileElement.getRootElement();
-                            updateDependencyVersion(rootElement.getDependencies(), newVersion, moduleNames);
+                            updateDependencyVersion(rootElement, newVersion, allModuleNames);
                         }
                     }
                 }
@@ -178,9 +172,22 @@ public class MvnProjectVersionDialog extends DialogWrapper {
         this.close(DialogWrapper.OK_EXIT_CODE);
     }
 
-    private void updateDependencyVersion(MavenDomDependencies mavenDomDependencies, String newVersion, Collection<String> moduleNames) {
-        List<MavenDomDependency> dependencies = mavenDomDependencies.getDependencies();
-        for (MavenDomDependency dependency : dependencies) {
+    private Collection<String> getAllModuleNames(){
+        Set<String> result = new HashSet<>();
+        for (MavenProject mavenProject : allProjects) {
+            result.addAll(mavenProject.getModulesPathsAndNames().values());
+        }
+        return result;
+    }
+
+    private void updateDependencyVersion(MavenDomProjectModel mavenDomProjectModel, String newVersion, Collection<String> moduleNames) {
+        updateDependencyVersion(mavenDomProjectModel.getDependencies(), newVersion, moduleNames);
+        updateDependencyVersion(mavenDomProjectModel.getDependencyManagement().getDependencies(), newVersion, moduleNames);
+    }
+
+    private void updateDependencyVersion(MavenDomDependencies dependencies, String newVersion, Collection<String> moduleNames) {
+        List<MavenDomDependency> dependencyList = dependencies.getDependencies();
+        for (MavenDomDependency dependency : dependencyList) {
             if (Objects.equals(dependency.getGroupId().getRawText(), rootProject.getMavenId().getGroupId()) &&
                     moduleNames.contains(dependency.getArtifactId().getRawText())
                     && dependency.getVersion().getValue() != null) {
