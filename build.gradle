@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.21'
+    id 'org.jetbrains.intellij' version '1.17.0'
 }
 
 group 'com.felixzz'
@@ -10,18 +10,13 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-}
-
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2020.2'
+    version = '2023.2'
     plugins = ['maven','java']
-    updateSinceUntilBuild false
 }
 
 patchPluginXml {
-    pluginDescription(file(descriptionFile).text)
-    changeNotes(file(changesFile).text)
+    pluginDescription = file(descriptionFile).text
+    changeNotes = file(changesFile).text
 }
