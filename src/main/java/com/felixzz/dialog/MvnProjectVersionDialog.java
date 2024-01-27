@@ -93,6 +93,7 @@ public class MvnProjectVersionDialog extends DialogWrapper {
                 initVersionField();
             }
         });
+        SwingUtilities.invokeLater(() -> newVersionContent.requestFocusInWindow());
         return dialogPanel;
     }
 
